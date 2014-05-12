@@ -17,10 +17,12 @@
     <xsl:if test="$ms=0000">
       <xsl:value-of select="concat('&lt;audio src=&quot;', $wav, '&quot;&gt; &#10;    ')"/>
     </xsl:if>
-    <xsl:value-of select="concat('&lt;cut ms=&quot;', $ms, '&quot;&gt; ')"/>
-    <xsl:for-each select="str:tokenize(string(), ' ')">
-      <xsl:value-of select="concat('{', $id, '_', position(),'}', string(), ' ')"/>
-    </xsl:for-each>
+    <xsl:value-of select="concat('&#10;&lt;cut ms=&quot;', $ms, '&quot;&gt; ')"/>
+    <xsl:apply-templates/>
+ </xsl:template>
+
+  <xsl:template match="xhtml:span[@word_id]">
+    <xsl:value-of select="concat('{', @word_id,'}', string())"/>
  </xsl:template>
 
 </xsl:stylesheet>

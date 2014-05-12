@@ -27,7 +27,7 @@
     </xsl:variable>
     <xsl:for-each select="str:tokenize(string(), ' ')">
       <xsl:element name="span" namespace="http://www.w3.org/1999/xhtml">
-	<xsl:attribute name="id">
+	<xsl:attribute name="word_id">
 	  <xsl:value-of select="concat($id, '_', $pos, '_', position())"/>
 	</xsl:attribute> 
 	<xsl:value-of select="string()"/>
