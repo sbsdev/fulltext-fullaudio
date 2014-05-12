@@ -14,7 +14,8 @@
 
   <xsl:template match="*[@id]">
     <xsl:copy>
-      <xsl:apply-templates mode="tokenize"/>
+      <xsl:apply-templates select="@*|*[not(text())]"/>
+      <xsl:apply-templates select="text()" mode="tokenize"/>
     </xsl:copy>
  </xsl:template>
 
