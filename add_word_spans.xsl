@@ -32,6 +32,9 @@
 	</xsl:attribute> 
 	<xsl:value-of select="string()"/>
       </xsl:element>
+      <xsl:if test="position()!=last()">
+	<xsl:text> </xsl:text>
+      </xsl:if>
     </xsl:for-each>
   </xsl:template>
 
