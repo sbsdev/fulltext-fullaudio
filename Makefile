@@ -6,10 +6,11 @@
 
 INPUT := Daisy-Export/Daisy-Export.htm
 SMILS := $(wildcard Daisy-Export/*.smil)
+OUTPUT := $(patsubst %.wav,%.txt,$(notdir $(wildcard Daisy-Export/*.wav)))
 
 XSLTPROC = xsltproc
 
-all: annosoft_input.txt partitioned.xml
+all: $(OUTPUT)
 
 # add span tags to all words
 input_with_spans.xml: $(INPUT)
@@ -22,20 +23,20 @@ audio.xml: $(SMILS)
 	echo "</markers>" >> $@
 
 # inline audio data
-input_with_audio_data.xml: input_with_spans.xml
-	$(XSLTPROC) --novalid inline_audio_data.xsl $^ > $@
+input_with_audio_data.xml: input_with_spans.xml audio.xml
+	$(XSLTPROC) --novalid inline_audio_data.xsl $< > $@
 
 # partition the input by wav
 partitioned.xml: input_with_audio_data.xml
-	$(XSLTPROC) --novalid partition_html.xsl $^ > $@
+	$(XSLTPROC) --novalid partition_html.xsl $< > $@
 
-# create input file for annosoft
-annosoft_input.txt: input_with_spans.xml audio.xml
-	$(XSLTPROC) --novalid dtbook2annosoft.xsl $< > $@
+# create input files for annosoft
+$(OUTPUT): partitioned.xml
+	$(XSLTPROC) --novalid split_files.xsl $< > /dev/null
 
 
 .PHONY : clean all
 
 clean:
-	rm -rf input_with_spans.xml audio.xml input_with_audio_data.xml partitioned.xml annosoft_input.txt
+	rm -rf input_with_spans.xml audio.xml input_with_audio_data.xml partitioned.xml $(OUTPUT)
 
