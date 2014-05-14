@@ -7,10 +7,11 @@
 INPUT := Daisy-Export/Daisy-Export.htm
 SMILS := $(wildcard Daisy-Export/*.smil)
 OUTPUT := $(patsubst %.wav,%.txt,$(notdir $(wildcard Daisy-Export/*.wav)))
+ZIP := Daisy-Export.zip
 
 XSLTPROC = xsltproc
 
-all: $(OUTPUT)
+all: $(ZIP)
 
 # add span tags to all words
 input_with_spans.xml: $(INPUT)
@@ -34,9 +35,11 @@ partitioned.xml: input_with_audio_data.xml
 $(OUTPUT): partitioned.xml
 	$(XSLTPROC) --novalid split_files.xsl $< > /dev/null
 
+$(ZIP): $(OUTPUT)
+	zip --quiet $(ZIP) $(OUTPUT)
 
 .PHONY : clean all
 
 clean:
-	rm -rf input_with_spans.xml audio.xml input_with_audio_data.xml partitioned.xml $(OUTPUT)
+	rm -rf input_with_spans.xml audio.xml input_with_audio_data.xml partitioned.xml $(OUTPUT) $(ZIP)
 
