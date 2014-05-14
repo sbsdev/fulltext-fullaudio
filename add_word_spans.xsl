@@ -12,14 +12,7 @@
 	      doctype-public="-//W3C//DTD XHTML 1.0 Transitional//EN"
               doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd" />
 
-  <xsl:template match="*[@id]">
-    <xsl:copy>
-      <xsl:apply-templates select="@*|*[not(text())]"/>
-      <xsl:apply-templates select="text()" mode="tokenize"/>
-    </xsl:copy>
- </xsl:template>
-
-  <xsl:template match="text()" mode="tokenize">
+  <xsl:template match="*[@id]//text()">
     <xsl:variable name="parent" select="ancestor::*[@id]"/>
     <xsl:variable name="id" select="$parent/@id"/>
     <xsl:variable name="pos">
