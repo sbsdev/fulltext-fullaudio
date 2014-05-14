@@ -15,10 +15,15 @@
     <xsl:variable name="filename" select="substring-before(@wav,'.wav')"/>
     <exsl:document href="{$filename}.txt" 
 		   omit-xml-declaration="yes" method="text" encoding="utf-8" indent="no">    
-      <xsl:value-of select="concat('&lt;audio src=&quot;', @wav, '&quot;&gt; &#10;')"/>
       <xsl:apply-templates/>
     </exsl:document>
   </xsl:template>
+
+  <xsl:template match="*[@ms]">
+    <xsl:value-of select="concat('&lt;cut ms=&quot;', @ms, '&quot;&gt; ')"/>
+    <xsl:apply-templates/>
+    <xsl:text>&#10;</xsl:text>
+ </xsl:template>
 
   <xsl:template match="xhtml:span[@word_id]">
     <xsl:value-of select="concat('{', @word_id,'}', string())"/>
