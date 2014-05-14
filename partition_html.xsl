@@ -13,15 +13,19 @@
   <xsl:variable name="num-nodes" select="count(//*[@id])"/>
   
   <xsl:template match="/">
-    <nodes>
+    <xsl:element name="html">
       <xsl:apply-templates/>
-    </nodes>
+    </xsl:element>
   </xsl:template>
 
   <xsl:template match="*[@wav]" priority="10">
     <xsl:variable name="pos" select="$num-nodes -
 				     count(following::*[@wav]/following::*[@id])"/>
     <xsl:element name="wav">
+      <xsl:attribute name="wav">
+	<xsl:value-of select="@wav"/>
+      </xsl:attribute> 
+      <xsl:copy-of select="."/>
       <xsl:copy-of select="following::*[@id and position() &lt;= $pos]"/>
     </xsl:element>
   </xsl:template>
