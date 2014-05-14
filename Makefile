@@ -35,6 +35,7 @@ partitioned.xml: input_with_audio_data.xml
 $(OUTPUT): partitioned.xml
 	$(XSLTPROC) --novalid split_files.xsl $< > /dev/null
 
+# pack it all up
 $(ZIP): $(OUTPUT)
 	zip --quiet $(ZIP) $(OUTPUT)
 
