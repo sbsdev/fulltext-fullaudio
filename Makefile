@@ -21,6 +21,10 @@ audio.xml: $(SMILS)
 	$(XSLTPROC) --novalid mergesmils.xsl $^ >> $@
 	echo "</markers>" >> $@
 
+# inline audio data
+input_with_audio_data.xml: input_with_spans.xml
+	$(XSLTPROC) --novalid inline_audio_data.xsl $^ > $@
+
 
 # create input file for annosoft
 annosoft_input.txt: input_with_spans.xml audio.xml
