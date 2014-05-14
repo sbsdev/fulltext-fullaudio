@@ -25,6 +25,9 @@ audio.xml: $(SMILS)
 input_with_audio_data.xml: input_with_spans.xml
 	$(XSLTPROC) --novalid inline_audio_data.xsl $^ > $@
 
+# partition the input by wav
+partitioned.xml: input_with_audio_data.xml
+	$(XSLTPROC) --novalid partition_html.xsl $^ > $@
 
 # create input file for annosoft
 annosoft_input.txt: input_with_spans.xml audio.xml
@@ -34,5 +37,5 @@ annosoft_input.txt: input_with_spans.xml audio.xml
 .PHONY : clean all
 
 clean:
-	rm -rf input_with_spans.xml audio.xml annosoft_input.txt
+	rm -rf input_with_spans.xml audio.xml input_with_audio_data.xml partitioned.xml annosoft_input.txt
 
