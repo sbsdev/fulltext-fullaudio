@@ -9,9 +9,7 @@ SMILS := $(wildcard Daisy-Export/*.smil)
 
 XSLTPROC = xsltproc
 
-# create input file for annosoft
-annosoft_input.txt: input_with_spans.xml audio.xml
-	$(XSLTPROC) --novalid dtbook2annosoft.xsl $< > $@
+all: annosoft_input.txt partitioned.xml
 
 # add span tags to all words
 input_with_spans.xml: $(INPUT)
@@ -24,7 +22,12 @@ audio.xml: $(SMILS)
 	echo "</markers>" >> $@
 
 
-.PHONY : clean
+# create input file for annosoft
+annosoft_input.txt: input_with_spans.xml audio.xml
+	$(XSLTPROC) --novalid dtbook2annosoft.xsl $< > $@
+
+
+.PHONY : clean all
 
 clean:
 	rm -rf input_with_spans.xml audio.xml annosoft_input.txt
