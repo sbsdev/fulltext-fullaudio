@@ -13,8 +13,8 @@
 
   <xsl:template match="*[@id]">
     <xsl:variable name="id" select="@id"/>
-    <xsl:variable name="begin" select="document('audio.xml')/markers/audio[@id=$id]/@clip-begin"/>
-    <xsl:variable name="wav" select="document('audio.xml')/markers/audio[@id=$id]/@src"/>
+    <xsl:variable name="begin" select="document('merged_smils.xml')/markers/audio[@id=$id]/@clip-begin"/>
+    <xsl:variable name="wav" select="document('merged_smils.xml')/markers/audio[@id=$id]/@src"/>
     <xsl:variable name="ms" select="translate(str:tokenize($begin,'=')[2],'.s','')"/>
     <xsl:copy>
       <xsl:attribute name="ms">

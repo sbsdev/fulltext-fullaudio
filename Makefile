@@ -18,13 +18,13 @@ input_with_spans.xml: $(INPUT)
 	$(XSLTPROC) --novalid add_word_spans.xsl $< > $@
 
 # merge all smils into one for easier processing
-audio.xml: $(SMILS)
+merged_smils.xml: $(SMILS)
 	echo "<markers>" > $@
 	$(XSLTPROC) --novalid mergesmils.xsl $^ >> $@
 	echo "</markers>" >> $@
 
 # inline audio data
-input_with_audio_data.xml: input_with_spans.xml audio.xml
+input_with_audio_data.xml: input_with_spans.xml merged_smils.xml
 	$(XSLTPROC) --novalid inline_audio_data.xsl $< > $@
 
 # partition the input by wav
@@ -41,5 +41,5 @@ $(ZIP): $(OUTPUT)
 .PHONY : clean all
 
 clean:
-	rm -rf input_with_spans.xml audio.xml input_with_audio_data.xml partitioned.xml $(OUTPUT) $(ZIP)
+	rm -rf input_with_spans.xml merged_smils.xml input_with_audio_data.xml partitioned.xml $(OUTPUT) $(ZIP)
 

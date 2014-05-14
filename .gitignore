@@ -1,8 +1,8 @@
 *~
-/annosoft_input.txt
-/input_with_spans.xml
-/partitioned.xml
-/input_with_audio_data.xml
 /*.txt
-
 /Daisy-Export.zip
+/annosoft_input.txt
+/input_with_audio_data.xml
+/input_with_spans.xml
+/merged_smils.xml
+/partitioned.xml
