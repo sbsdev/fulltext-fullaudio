@@ -10,8 +10,9 @@
 
   <xsl:output method="xml" encoding="utf-8" indent="yes" />
 
-  <xsl:variable name="num-nodes" select="count(//*[@id])"/>
-  
+  <!-- The idea behind this code is from XSLT Cookbook, 2nd Edition,
+       Chapter 6.8 "Deepening an XML Hierarchy" -->
+
   <xsl:template match="/">
     <xsl:element name="html">
       <xsl:apply-templates/>
@@ -19,14 +20,16 @@
   </xsl:template>
 
   <xsl:template match="*[@wav]" priority="10">
-    <xsl:variable name="pos" select="$num-nodes -
-				     count(following::*[@wav]/following::*[@id])"/>
+    <!-- All nodes following this element -->
+    <xsl:variable name="nodes1" select="following::*[@id][not(@wav)]"/>
+    <!-- All nodes following the next element that contains a @wav attribute -->
+    <xsl:variable name="nodes2" select="following::*[@wav]/following::*[@id]"/>
     <xsl:element name="wav">
       <xsl:attribute name="wav">
 	<xsl:value-of select="@wav"/>
       </xsl:attribute> 
       <xsl:copy-of select="."/>
-      <xsl:copy-of select="following::*[@id and position() &lt;= $pos]"/>
+      <xsl:copy-of select="$nodes1[count(. | $nodes2) != count($nodes2)]"/>
     </xsl:element>
   </xsl:template>
 

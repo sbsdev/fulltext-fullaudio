@@ -9,7 +9,7 @@ SMILS := $(wildcard Daisy-Export/*.smil)
 OUTPUT := $(patsubst %.wav,%.txt,$(notdir $(wildcard Daisy-Export/*.wav)))
 ZIP := Daisy-Export.zip
 
-XSLTPROC = xsltproc
+XSLTPROC := xsltproc
 
 all: $(ZIP)
 
