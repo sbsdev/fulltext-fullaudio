@@ -5,14 +5,18 @@
 # notice and this notice are preserved.
 
 INPUT := Daisy-Export/Daisy-Export.htm
+INPUT_NOTDIR := $(notdir $(INPUT))
 SMILS := $(wildcard Daisy-Export/*.smil)
 OUTPUT := $(patsubst %.wav,%.txt,$(notdir $(wildcard Daisy-Export/*.wav)))
 WITHBOM := $(patsubst %.txt,%.bom.txt,$(OUTPUT))
 ZIP := Daisy-Export.zip
 
+ANNOSOFT := $(wildcard Daisy-Export-XML/*.xml)
+TIMECODES := $(patsubst %.xml,%.time,$(ANNOSOFT))
+
 XSLTPROC := xsltproc
 
-all: $(ZIP)
+all: $(ZIP) $(TIMECODES)
 
 # add span tags to all words
 input_with_spans.xml: $(INPUT)
@@ -46,8 +50,14 @@ $(WITHBOM): $(OUTPUT)
 $(ZIP): $(WITHBOM)
 	zip --quiet $@ $^
 
+# extract and calculate time codes
+%.time: %.xml
+	$(XSLTPROC) --novalid --stringparam src-file $(INPUT_NOTDIR) extract_timecodes.xsl $< > $@
+
+$(TIMECODES): $(ANNOSOFT)
+
 .PHONY : clean all
 
 clean:
-	rm -rf input_with_spans.xml merged_smils.xml input_with_audio_data.xml partitioned.xml $(OUTPUT) $(WITHBOM) $(ZIP)
+	rm -rf input_with_spans.xml merged_smils.xml input_with_audio_data.xml partitioned.xml $(OUTPUT) $(WITHBOM) $(ZIP) $(TIMECODES)
 
