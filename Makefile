@@ -7,6 +7,7 @@
 INPUT := Daisy-Export/Daisy-Export.htm
 SMILS := $(wildcard Daisy-Export/*.smil)
 OUTPUT := $(patsubst %.wav,%.txt,$(notdir $(wildcard Daisy-Export/*.wav)))
+WITHBOM := $(patsubst %.txt,%.bom.txt,$(OUTPUT))
 ZIP := Daisy-Export.zip
 
 XSLTPROC := xsltproc
@@ -35,12 +36,18 @@ partitioned.xml: input_with_audio_data.xml
 $(OUTPUT): partitioned.xml
 	$(XSLTPROC) --novalid split_files.xsl $< > /dev/null
 
+# bomify for winblows
+%.bom.txt: %.txt
+	uconv -f utf-8 -t utf-8 --add-signature $< > $@
+
+$(WITHBOM): $(OUTPUT)
+
 # pack it all up
-$(ZIP): $(OUTPUT)
-	zip --quiet $(ZIP) $(OUTPUT)
+$(ZIP): $(WITHBOM)
+	zip --quiet $@ $^
 
 .PHONY : clean all
 
 clean:
-	rm -rf input_with_spans.xml merged_smils.xml input_with_audio_data.xml partitioned.xml $(OUTPUT) $(ZIP)
+	rm -rf input_with_spans.xml merged_smils.xml input_with_audio_data.xml partitioned.xml $(OUTPUT) $(WITHBOM) $(ZIP)
 
