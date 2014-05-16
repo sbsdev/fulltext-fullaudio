@@ -23,10 +23,19 @@
 					    '.',
 					    substring(@msStart,string-length(@msStart)-2),
 					    's')"/>
+    <xsl:variable name="next-word" select="following-sibling::word[1]"/>
+    <!-- Use the start of the next word an the end (if there is a next -->
+    <!-- word). Otherwise the pauses will be dropped -->
+    <xsl:variable name="end">
+      <xsl:choose>
+	<xsl:when test="$next-word"><xsl:value-of select="$next-word/@msStart"/></xsl:when>
+	<xsl:otherwise><xsl:value-of select="@msEnd"/></xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
     <xsl:variable name="clip-end" select="concat('npt=',
-					  substring(@msEnd,1,string-length(@msEnd)-3),
+					  substring($end,1,string-length($end)-3),
 					  '.',
-					  substring(@msEnd,string-length(@msEnd)-2),
+					  substring($end,string-length($end)-2),
 					  's')"/>
     <xsl:variable name="id" select="substring-before(substring-after(preceding-sibling::xmlmark[1],'{'),'}')"/>
     <par id="par{$par}" endsync="last">
