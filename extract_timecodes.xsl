@@ -6,6 +6,7 @@
   <xsl:output method="xml" encoding="utf-8" indent="yes" />
 
   <xsl:param name="src-file" select="'dtbook.xml'"/>
+  <xsl:param name="wav-file" select="'dtbook.wav'"/>
 
   <xsl:template match="/">
     <timecodes>
@@ -31,7 +32,7 @@
     <par id="par{$par}" endsync="last">
       <text id="{$id}" src="{$src-file}#{$id}"/>
       <xsl:comment><xsl:value-of select="."/></xsl:comment>
-      <audio src="" clip-begin="{$clip-begin}" clip-end="{$clip-end}"/>
+      <audio src="{$wav-file}" clip-begin="{$clip-begin}" clip-end="{$clip-end}"/>
     </par>
   </xsl:template>
 

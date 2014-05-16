@@ -52,7 +52,7 @@ $(ZIP): $(WITHBOM)
 
 # extract and calculate time codes
 %.time: %.xml
-	$(XSLTPROC) --novalid --stringparam src-file $(INPUT_NOTDIR) extract_timecodes.xsl $< > $@
+	$(XSLTPROC) --novalid --stringparam src-file $(INPUT_NOTDIR) --stringparam wav-file $(addsuffix .wav, $(basename $(notdir $@))) extract_timecodes.xsl $< > $@
 
 $(TIMECODES): $(ANNOSOFT)
 
