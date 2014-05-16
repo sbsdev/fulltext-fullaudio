@@ -32,25 +32,25 @@ daisy-book: $(BUILDDIR) $(BUILD_WAVS)
 
 # add span tags to all words
 $(TMPDIR)/input_with_spans.xml: $(INPUT)
-	$(XSLTPROC) --novalid add_word_spans.xsl $< > $@
+	$(XSLTPROC) --novalid xsl/add_word_spans.xsl $< > $@
 
 # merge all smils into one for easier processing
 $(TMPDIR)/merged_smils.xml: $(SMILS)
 	echo "<markers>" > $@
-	$(XSLTPROC) --novalid mergesmils.xsl $^ >> $@
+	$(XSLTPROC) --novalid xsl/mergesmils.xsl $^ >> $@
 	echo "</markers>" >> $@
 
 # inline audio data
 $(TMPDIR)/input_with_audio_data.xml: $(TMPDIR)/input_with_spans.xml $(TMPDIR)/merged_smils.xml
-	$(XSLTPROC) --novalid --stringparam tmp-dir $(TMPDIR) inline_audio_data.xsl $< > $@
+	$(XSLTPROC) --novalid --stringparam tmp-dir $(abspath $(TMPDIR)) xsl/inline_audio_data.xsl $< > $@
 
 # partition the input by wav
 $(TMPDIR)/partitioned.xml: $(TMPDIR)/input_with_audio_data.xml
-	$(XSLTPROC) --novalid partition_html.xsl $< > $@
+	$(XSLTPROC) --novalid xsl/partition_html.xsl $< > $@
 
 # create input files for annosoft
 $(ANNOSOFT_OUTPUT): $(TMPDIR)/partitioned.xml
-	$(XSLTPROC) --novalid --stringparam annosoft-dir $(ANNOSOFTOUTDIR) split_files.xsl $< > /dev/null
+	$(XSLTPROC) --novalid --stringparam annosoft-dir $(ANNOSOFTOUTDIR) xsl/split_files.xsl $< > /dev/null
 
 # bomify for winblows
 %.bom.txt: %.txt
@@ -64,7 +64,7 @@ $(ANNOSOFT_ZIP): $(ANNOSOFT_WITHBOM)
 
 # extract and calculate time codes
 %.time: %.xml
-	$(XSLTPROC) --novalid --stringparam src-file $(INPUT_NOTDIR) --stringparam wav-file $(addsuffix .wav, $(basename $(notdir $@))) extract_timecodes.xsl $< > $@
+	$(XSLTPROC) --novalid --stringparam src-file $(INPUT_NOTDIR) --stringparam wav-file $(addsuffix .wav, $(basename $(notdir $@))) xsl/extract_timecodes.xsl $< > $@
 
 $(TIMECODES): $(ANNOSOFT_INPUT)
 
