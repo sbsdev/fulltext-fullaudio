@@ -11,9 +11,12 @@
 
   <xsl:output method="text" encoding="utf-8" omit-xml-declaration="yes" indent="no" />
 
+  <xsl:param name="annosoft-dir" select="'annosoft-out'"/>
+
   <xsl:template match="wav">
     <xsl:variable name="filename" select="substring-before(@wav,'.wav')"/>
-    <exsl:document href="{$filename}.txt" 
+    <xsl:message><xsl:value-of select="concat($annosoft-dir,'/',$filename)"/></xsl:message>
+    <exsl:document href="{$annosoft-dir}/{$filename}.txt" 
 		   omit-xml-declaration="yes" method="text" encoding="utf-8" indent="no">    
       <xsl:apply-templates/>
     </exsl:document>

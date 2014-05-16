@@ -11,10 +11,14 @@
   
   <xsl:output method="xml" encoding="utf-8" indent="yes" />
 
+  <xsl:param name="tmp-dir" select="'tmp'"/>
+
   <xsl:template match="*[@id]">
     <xsl:variable name="id" select="@id"/>
-    <xsl:variable name="begin" select="document('merged_smils.xml')/markers/audio[@id=$id]/@clip-begin"/>
-    <xsl:variable name="wav" select="document('merged_smils.xml')/markers/audio[@id=$id]/@src"/>
+    <xsl:variable name="filename" select="concat($tmp-dir, '/merged_smils.xml')"/>
+    
+    <xsl:variable name="begin" select="document($filename)/markers/audio[@id=$id]/@clip-begin"/>
+    <xsl:variable name="wav" select="document($filename)/markers/audio[@id=$id]/@src"/>
     <xsl:variable name="ms" select="translate(str:tokenize($begin,'=')[2],'.s','')"/>
     <xsl:copy>
       <xsl:attribute name="ms">

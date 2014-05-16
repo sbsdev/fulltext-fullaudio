@@ -4,60 +4,82 @@
 # are permitted in any medium without royalty provided the copyright
 # notice and this notice are preserved.
 
-INPUT := Daisy-Export/Daisy-Export.htm
-INPUT_NOTDIR := $(notdir $(INPUT))
-SMILS := $(wildcard Daisy-Export/*.smil)
-OUTPUT := $(patsubst %.wav,%.txt,$(notdir $(wildcard Daisy-Export/*.wav)))
-WITHBOM := $(patsubst %.txt,%.bom.txt,$(OUTPUT))
-ZIP := Daisy-Export.zip
+SRCDIR := Daisy-Export
+ANNOSOFTOUTDIR := annosoft-out
+ANNOSOFTINDIR := annosoft-in
+BUILDDIR := build
+TMPDIR := tmp
 
-ANNOSOFT := $(wildcard Daisy-Export-XML/*.xml)
-TIMECODES := $(patsubst %.xml,%.time,$(ANNOSOFT))
+INPUT := $(SRCDIR)/Daisy-Export.htm
+INPUT_NOTDIR := $(notdir $(INPUT))
+SMILS := $(wildcard $(SRCDIR)/*.smil)
+ANNOSOFT_OUTPUT := $(patsubst %.wav,$(ANNOSOFTOUTDIR)/%.txt,$(notdir $(wildcard $(SRCDIR)/*.wav)))
+ANNOSOFT_WITHBOM := $(patsubst %.txt,%.bom.txt,$(ANNOSOFT_OUTPUT))
+ANNOSOFT_ZIP := Daisy-Export.zip
+
+WAVS := $(wildcard $(SRCDIR)/*.wav)
+BUILD_WAVS := $(patsubst %,$(BUILDDIR)/%,$(notdir $(WAVS)))
+
+ANNOSOFT_INPUT := $(wildcard $(ANNOSOFTINDIR)/*.xml)
+TIMECODES := $(patsubst %.xml,%.time,$(ANNOSOFT_INPUT))
 
 XSLTPROC := xsltproc
 
-all: $(ZIP) $(TIMECODES)
+all: annosoft-input daisy-book
+
+annosoft-input: $(TMPDIR) $(ANNOSOFTOUTDIR) $(ANNOSOFT_ZIP)
+daisy-book: $(BUILDDIR) $(BUILD_WAVS)
 
 # add span tags to all words
-input_with_spans.xml: $(INPUT)
+$(TMPDIR)/input_with_spans.xml: $(INPUT)
 	$(XSLTPROC) --novalid add_word_spans.xsl $< > $@
 
 # merge all smils into one for easier processing
-merged_smils.xml: $(SMILS)
+$(TMPDIR)/merged_smils.xml: $(SMILS)
 	echo "<markers>" > $@
 	$(XSLTPROC) --novalid mergesmils.xsl $^ >> $@
 	echo "</markers>" >> $@
 
 # inline audio data
-input_with_audio_data.xml: input_with_spans.xml merged_smils.xml
-	$(XSLTPROC) --novalid inline_audio_data.xsl $< > $@
+$(TMPDIR)/input_with_audio_data.xml: $(TMPDIR)/input_with_spans.xml $(TMPDIR)/merged_smils.xml
+	$(XSLTPROC) --novalid --stringparam tmp-dir $(TMPDIR) inline_audio_data.xsl $< > $@
 
 # partition the input by wav
-partitioned.xml: input_with_audio_data.xml
+$(TMPDIR)/partitioned.xml: $(TMPDIR)/input_with_audio_data.xml
 	$(XSLTPROC) --novalid partition_html.xsl $< > $@
 
 # create input files for annosoft
-$(OUTPUT): partitioned.xml
-	$(XSLTPROC) --novalid split_files.xsl $< > /dev/null
+$(ANNOSOFT_OUTPUT): $(TMPDIR)/partitioned.xml
+	$(XSLTPROC) --novalid --stringparam annosoft-dir $(ANNOSOFTOUTDIR) split_files.xsl $< > /dev/null
 
 # bomify for winblows
 %.bom.txt: %.txt
 	uconv -f utf-8 -t utf-8 --add-signature $< > $@
 
-$(WITHBOM): $(OUTPUT)
+$(ANNOSOFT_WITHBOM): $(ANNOSOFT_OUTPUT)
 
 # pack it all up
-$(ZIP): $(WITHBOM)
+$(ANNOSOFT_ZIP): $(ANNOSOFT_WITHBOM)
 	zip --quiet $@ $^
 
 # extract and calculate time codes
 %.time: %.xml
 	$(XSLTPROC) --novalid --stringparam src-file $(INPUT_NOTDIR) --stringparam wav-file $(addsuffix .wav, $(basename $(notdir $@))) extract_timecodes.xsl $< > $@
 
-$(TIMECODES): $(ANNOSOFT)
+$(TIMECODES): $(ANNOSOFT_INPUT)
 
-.PHONY : clean all
+# put all the artifacts into the build dir
+$(BUILDDIR)/%.wav: $(SRCDIR)/%.wav
+	cp $< $@
+
+$(BUILD_WAVS): $(WAVS)
+
+# create all build dirs
+$(ANNOSOFTOUTDIR) $(BUILDDIR) $(TMPDIR):
+	mkdir $@
+
+.PHONY : clean all annosoft-input daisy-book
 
 clean:
-	rm -rf input_with_spans.xml merged_smils.xml input_with_audio_data.xml partitioned.xml $(OUTPUT) $(WITHBOM) $(ZIP) $(TIMECODES)
+	rm -rf $(TMPDIR) $(ANNOSOFT_ZIP) $(TIMECODES) $(BUILDDIR) $(ANNOSOFTOUTDIR)
 
