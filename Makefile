@@ -19,6 +19,7 @@ ANNOSOFT_ZIP := Daisy-Export.zip
 
 WAVS := $(wildcard $(SRCDIR)/*.wav)
 BUILD_WAVS := $(patsubst %,$(BUILDDIR)/%,$(notdir $(WAVS)))
+OUTPUT_HTML := $(BUILDDIR)/Daisy-Export.htm
 
 ANNOSOFT_INPUT := $(wildcard $(ANNOSOFTINDIR)/*.xml)
 TIMECODES := $(patsubst %.xml,%.time,$(ANNOSOFT_INPUT))
@@ -28,7 +29,6 @@ XSLTPROC := xsltproc
 all: annosoft-input daisy-book
 
 annosoft-input: $(TMPDIR) $(ANNOSOFTOUTDIR) $(ANNOSOFT_ZIP)
-daisy-book: $(BUILDDIR) $(BUILD_WAVS)
 
 # add span tags to all words
 $(TMPDIR)/input_with_spans.xml: $(INPUT)
@@ -62,6 +62,8 @@ $(ANNOSOFT_WITHBOM): $(ANNOSOFT_OUTPUT)
 $(ANNOSOFT_ZIP): $(ANNOSOFT_WITHBOM)
 	zip --quiet $@ $^
 
+daisy-book: $(BUILDDIR) $(OUTPUT_HTML) $(BUILD_WAVS) 
+
 # extract and calculate time codes
 %.time: %.xml
 	$(XSLTPROC) --novalid --stringparam src-file $(INPUT_NOTDIR) --stringparam wav-file $(addsuffix .wav, $(basename $(notdir $@))) xsl/extract_timecodes.xsl $< > $@
@@ -73,6 +75,9 @@ $(BUILDDIR)/%.wav: $(SRCDIR)/%.wav
 	cp $< $@
 
 $(BUILD_WAVS): $(WAVS)
+
+$(OUTPUT_HTML): $(INPUT)
+	$(XSLTPROC) --novalid --stringparam with_word_id no xsl/add_word_spans.xsl $< > $@
 
 # create all build dirs
 $(ANNOSOFTOUTDIR) $(BUILDDIR) $(TMPDIR):

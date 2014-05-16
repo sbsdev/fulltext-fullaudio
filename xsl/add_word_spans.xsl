@@ -12,6 +12,8 @@
 	      doctype-public="-//W3C//DTD XHTML 1.0 Transitional//EN"
               doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd" />
 
+  <xsl:param name="with_word_id" select="'yes'"/>
+
   <xsl:template match="*[@id]//text()">
     <xsl:variable name="parent" select="ancestor::*[@id]"/>
     <xsl:variable name="id" select="$parent/@id"/>
@@ -20,7 +22,13 @@
     </xsl:variable>
     <xsl:for-each select="str:tokenize(string(), ' ')">
       <xsl:element name="span" namespace="http://www.w3.org/1999/xhtml">
-	<xsl:attribute name="word_id">
+	<xsl:variable name="attr_name">
+	  <xsl:choose>
+	    <xsl:when test="$with_word_id='yes'">word_id</xsl:when>
+	    <xsl:otherwise>id</xsl:otherwise>
+	  </xsl:choose>
+	</xsl:variable>
+	<xsl:attribute name="{$attr_name}">
 	  <xsl:value-of select="concat($id, '_', $pos, '_', position())"/>
 	</xsl:attribute> 
 	<xsl:value-of select="string()"/>
