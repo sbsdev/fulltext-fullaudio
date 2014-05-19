@@ -7,13 +7,10 @@
   
   <xsl:output method="xml" encoding="utf-8" indent="yes" />
 
-  <xsl:template match="xhtml:a">
-    <xsl:copy>
-      <xsl:attribute name="href">
-	<xsl:value-of select="concat(@href,'_0_1')"/>
-      </xsl:attribute>
-      <xsl:copy-of select="*"/>
-    </xsl:copy>
+  <xsl:template match="xhtml:a/@href">
+    <xsl:attribute name="href">
+      <xsl:value-of select="concat(.,'_0_1')"/>
+    </xsl:attribute>
  </xsl:template>
 
   <!-- Copy all other elements and attributes -->
