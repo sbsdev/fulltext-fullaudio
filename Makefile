@@ -13,8 +13,8 @@ TMPDIR := tmp
 INPUT := $(SRCDIR)/Daisy-Export.htm
 INPUT_NOTDIR := $(notdir $(INPUT))
 SMILS := $(wildcard $(SRCDIR)/*.smil)
-ANNOSOFT_INPUT := $(patsubst %.wav,$(ANNOSOFT_INPUT_DIR)/%.txt,$(notdir $(wildcard $(SRCDIR)/*.wav)))
-ANNOSOFT_WITHBOM := $(patsubst %.txt,%.bom.txt,$(ANNOSOFT_INPUT))
+ANNOSOFT_INPUT := $(patsubst %.wav,$(TMPDIR)/%.txt,$(notdir $(wildcard $(SRCDIR)/*.wav)))
+ANNOSOFT_WITHBOM := $(patsubst $(TMPDIR)/%.txt,$(ANNOSOFT_INPUT_DIR)/%.txt,$(ANNOSOFT_INPUT))
 ANNOSOFT_ZIP := Daisy-Export.zip
 
 WAVS := $(wildcard $(SRCDIR)/*.wav)
@@ -53,10 +53,10 @@ $(TMPDIR)/partitioned.xml: $(TMPDIR)/input_with_audio_data.xml
 
 # create input files for annosoft
 $(ANNOSOFT_INPUT): $(TMPDIR)/partitioned.xml
-	$(XSLTPROC) --novalid --stringparam annosoft-dir $(ANNOSOFT_INPUT_DIR) xsl/split_files.xsl $< > /dev/null
+	$(XSLTPROC) --novalid --stringparam dir $(TMPDIR) xsl/split_files.xsl $< > /dev/null
 
 # bomify for winblows
-%.bom.txt: %.txt
+$(ANNOSOFT_INPUT_DIR)/%.txt: $(TMPDIR)/%.txt
 	uconv -f utf-8 -t utf-8 --add-signature $< > $@
 
 $(ANNOSOFT_WITHBOM): $(ANNOSOFT_INPUT)
