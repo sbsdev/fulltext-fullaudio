@@ -7,9 +7,9 @@
   
   <xsl:output method="xml" encoding="utf-8" indent="yes" />
 
-  <xsl:template match="xhtml:a/@href">
-    <xsl:attribute name="href">
-      <xsl:value-of select="concat(.,'_1_1')"/>
+  <xsl:template match="@word_id">
+    <xsl:attribute name="id">
+      <xsl:value-of select="."/>
     </xsl:attribute>
  </xsl:template>
 

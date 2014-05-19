@@ -27,6 +27,7 @@ ANNOSOFT_OUTPUT := $(wildcard $(ANNOSOFT_OUTPUT_DIR)/*.xml)
 TIMECODES := $(patsubst %.xml,%.time,$(ANNOSOFT_OUTPUT))
 
 XSLTPROC := xsltproc
+SAXON := java -jar /usr/share/java/Saxon-HE-9.4.0.7.jar
 
 all: annosoft-input daisy-book
 
@@ -34,7 +35,7 @@ annosoft-input: $(TMPDIR) $(ANNOSOFT_INPUT_DIR) $(ANNOSOFT_ZIP)
 
 # add span tags to all words
 $(TMPDIR)/input_with_spans.xml: $(INPUT)
-	$(XSLTPROC) --novalid xsl/add_word_spans.xsl $< > $@
+	$(SAXON) -xsl:xsl/add_word_spans.xsl -s:$< -o:$@
 
 # merge all smils into one for easier processing
 $(TMPDIR)/merged_smils.xml: $(SMILS)
@@ -80,7 +81,7 @@ $(OUTPUT_WAVS): $(WAVS)
 
 # copy the original html and inline the spans
 $(OUTPUT_HTML): $(INPUT)
-	$(XSLTPROC) --novalid --stringparam with_word_id no xsl/add_word_spans.xsl $< > $@
+	$(SAXON) -s:$< -xsl:xsl/add_word_spans.xsl | $(XSLTPROC) --novalid xsl/word_id2word.xsl - > $@
 
 # copy and enrich the smils
 $(BUILDDIR)/master.smil: $(SRCDIR)/master.smil
