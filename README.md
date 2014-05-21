@@ -1,4 +1,4 @@
-# fulltext-fullaudio
+# Full-text Full-audio DAISY Talking Books
 
 Prototype to generate fulltext fullaudio [DAISY Talking Books][] using
 the [Annosoft Lipsync Tool][].
