@@ -9,6 +9,13 @@
 	      doctype-public="-//W3C//DTD XHTML 1.0 Transitional//EN"
               doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd" />
 
+  <xsl:template match="xhtml:a/@href">
+    <!-- Fix the smil refs to the new ids -->
+    <xsl:attribute name="href">
+      <xsl:value-of select="if (matches(., '\.smil#')) then concat(.,'_1_1') else ."/>
+    </xsl:attribute>
+  </xsl:template>
+
   <xsl:template match="*[@id]//text()">
     <xsl:variable name="parent" select="ancestor::*[@id]"/>
     <xsl:variable name="id" select="$parent/@id"/>
